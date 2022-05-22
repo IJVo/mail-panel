@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of the Nextras\MailPanel library.
@@ -17,12 +19,12 @@ use Nette\Utils\Strings;
 use Tracy\Debugger;
 use Tracy\IBarPanel;
 
-
 /**
  * Extension for Tracy bar which shows sent emails
  */
 class MailPanel implements IBarPanel
 {
+
 	use Nette\SmartObject;
 
 	/** @const int */
@@ -73,11 +75,11 @@ class MailPanel implements IBarPanel
 
 		return '<span title="Mail Panel">' .
 			'<svg viewBox="0 0 16 16">' .
-  			'	<rect x="0" y="2" width="16" height="11" rx="1" ry="1" fill="#588ac8"/>' .
-  			'	<rect x="1" y="3" width="14" height="9" fill="#eef3f8"/>' .
-  			'	<rect x="2" y="4" width="12" height="7" fill="#dcebfe"/>' .
-  			'	<path d="M 2 11 l 4 -4 q 2 -2 4 0 l 4 4" stroke="#bbccdd" fill="none"/>' .
-  			'	<path d="M 2 4 l 4 4 q 2 2 4 0 l 4 -4" stroke="#85aae2" fill="#dee8f7"/>' .
+			'	<rect x="0" y="2" width="16" height="11" rx="1" ry="1" fill="#588ac8"/>' .
+			'	<rect x="1" y="3" width="14" height="9" fill="#eef3f8"/>' .
+			'	<rect x="2" y="4" width="12" height="7" fill="#dcebfe"/>' .
+			'	<path d="M 2 11 l 4 -4 q 2 -2 4 0 l 4 4" stroke="#bbccdd" fill="none"/>' .
+			'	<path d="M 2 4 l 4 4 q 2 2 4 0 l 4 -4" stroke="#85aae2" fill="#dee8f7"/>' .
 			'</svg>' .
 			'<span class="tracy-label">' . $label . '</span></span>';
 	}
@@ -93,8 +95,8 @@ class MailPanel implements IBarPanel
 		}
 
 		return $this->getLatte()->renderToString(__DIR__ . '/MailPanel.latte', [
-			'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
-			'messages' => $this->mailer->getMessages($this->messagesLimit),
+				'panelId' => substr(md5(uniqid('', TRUE)), 0, 6),
+				'messages' => $this->mailer->getMessages($this->messagesLimit),
 		]);
 	}
 
@@ -127,26 +129,8 @@ class MailPanel implements IBarPanel
 				$this->latte->setTempDirectory($this->tempDir);
 			}
 
-			if (version_compare(Latte\Engine::VERSION, '3', '<')) {
 			$this->latte->addFunction('link', [$this, 'getLink']);
 
-			} else {
-				$this->latte->addExtension(new class extends Latte\Extension {
-					public function getTags(): array
-					{
-						return ['link' => function (Latte\Compiler\Tag $tag) {
-							$dest = $tag->parser->parseUnquotedStringOrExpression();
-							$tag->parser->stream->tryConsume(',');
-							$args = $tag->parser->parseArguments();
-							return new Latte\Compiler\Nodes\AuxiliaryNode(
-								function (Latte\Compiler\PrintContext $context) use ($dest, $args) {
-									$context->format('echo %escape(call_user_func($getLink, %raw, %raw));', $dest, $args);
-								}
-							);
-						}];
-					}
-				});
-			}
 			$this->latte->addFilter('attachmentLabel', function (MimePart $attachment) {
 				$contentDisposition = $attachment->getHeader('Content-Disposition');
 				$contentType = $attachment->getHeader('Content-Type');
@@ -191,16 +175,12 @@ class MailPanel implements IBarPanel
 
 		if ($action === 'detail' && is_string($messageId)) {
 			$this->handleDetail($messageId);
-
 		} elseif ($action === 'source' && is_string($messageId)) {
 			$this->handleSource($messageId);
-
 		} elseif ($action === 'attachment' && is_string($messageId) && ctype_digit($attachmentId)) {
 			$this->handleAttachment($messageId, (int) $attachmentId);
-
 		} elseif ($action === 'delete-one' && is_string($messageId)) {
 			$this->handleDeleteOne($messageId);
-
 		} elseif ($action === 'delete-all') {
 			$this->handleDeleteAll();
 		}
@@ -271,7 +251,6 @@ class MailPanel implements IBarPanel
 
 		if ($refererUrl === NULL) {
 			throw new \RuntimeException('Unable to redirect back because your browser did not send referrer');
-
 		} elseif ($currentUrl->isEqual($refererUrl)) {
 			throw new \RuntimeException('Unable to redirect back because it would create loop');
 		}
